@@ -128,8 +128,8 @@ v.onended=()=>cur<items.length-1&&play(cur+1);
 v.onerror=()=>{if(cur>=0)now.textContent=items[cur].title+' — браузер не может воспроизвести этот формат'};
 (async()=>{
   await walk('/','',items,new Set());
-  items.push({cat:'TV',yt:'ac_kS49M95w',title:'Нурландос',sub:'фильм с Нурланом Сабуровым',pv:'https://i.ytimg.com/vi/ac_kS49M95w/hqdefault.jpg'});
-  const order=['Selected','Music video','Commercial','TV','Fashion','Reels'];
+  items.push({cat:'Film',yt:'ac_kS49M95w',title:'Нурландос',sub:'фильм с Нурланом Сабуровым',pv:'https://i.ytimg.com/vi/ac_kS49M95w/hqdefault.jpg'});
+  const order=['Selected','Music video','Commercial','TV','Film','Fashion','Reels'];
   items.sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));
   const spread=a=>{const m=a.filter(x=>x.title==='Malbec'),o=a.filter(x=>x.title!=='Malbec');if(!o.length)return a;const r=[...o];m.forEach((x,i)=>r.splice(Math.round((i+1)*o.length/(m.length+1))+i,0,x));return r};
   items=order.flatMap(c=>spread(items.filter(x=>x.cat===c))).concat(items.filter(x=>!order.includes(x.cat)));
