@@ -1215,3 +1215,15 @@ html.look-sky {
 }
 .about__links a:hover { background: var(--fg); color: var(--bg); }
 .about, .about * { text-transform: none; }
+
+/* reels: the big title sits in the middle of the card, never past its edges */
+.ht.is-reel { overflow: hidden; border-radius: var(--r-card); }
+.ht.is-reel .ht__title { bottom: auto; top: 50%; translate: 0 -50%; }
+/* phones: a little more air at the sides, tighter section rhythm, room above the dock */
+@media (max-width: 900px) {
+  :root { --pad: max(14px, env(safe-area-inset-left, 0px)); --gap: 10px; }
+  .sect { margin-top: 30px; font-size: 26px; padding: 0 2px; }
+  .sect:first-child { margin-top: 4px; }
+  .about { font-size: 16px; padding-bottom: 120px; }
+  .about__links a { padding: .65em 1.1em; }
+}

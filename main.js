@@ -614,12 +614,22 @@ function place(t) {
   // room left beside it (minus the title's drift)
   const box = card.getBoundingClientRect();
   const centre = box.left + W / 2, vw = document.documentElement.clientWidth;
-  const room = Math.max(W * 0.6, Math.min(W * SPILL, 2 * (Math.min(centre, vw - centre) - EDGE)));
+  // tall reels keep the word inside the card and centred in it
+  const reel = card.classList.contains('card--reel');
+  const room = reel ? W * 0.88 : Math.max(W * 0.6, Math.min(W * SPILL, 2 * (Math.min(centre, vw - centre) - EDGE)));
   let size = room / per;                       // one line
-  const wrap = size < H * 0.2;                 // too long for one line: several lines instead
-  if (wrap) size = Math.max(H * 0.1, Math.min(H * 0.2, Math.sqrt((room * H * 0.62) / (per * 0.9))));
-  size = Math.min(size, H * 0.62);
+  const wrap = size < H * (reel ? 0.09 : 0.2); // too long for one line: several lines instead
+  if (wrap) {
+    size = Math.max(H * 0.1, Math.min(H * 0.2, Math.sqrt((room * H * 0.62) / (per * 0.9))));
+    // the longest word still has to fit on its own line
+    const longest = text.split(/\s+/).reduce((a, b) => (b.length > a.length ? b : a), '');
+    mctx.font = `800 100px ${getComputedStyle(document.body).fontFamily}`;
+    const perL = Math.max(1, mctx.measureText(longest).width - 1.2 * longest.length) / 100;
+    size = Math.min(size, (room * 0.96) / perL);
+  }
+  size = Math.min(size, H * (reel ? 0.3 : 0.62));
   const { ht, title, face, artist } = t;
+  ht.classList.toggle('is-reel', reel);
   title.style.left = title.style.right = ((W - room) / 2).toFixed(1) + 'px';
   ht.classList.toggle('is-wrap', wrap);
   ht.style.left = card.offsetLeft + 'px';
