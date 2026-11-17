@@ -14,14 +14,17 @@ h2{font-size:12px;color:var(--dim);font-weight:400;text-transform:lowercase;marg
 ul{list-style:none;margin:0;padding:0}
 li{padding:5px 0;cursor:pointer;transition:opacity .2s}
 li:hover{opacity:.6}li.on{color:#fff;font-weight:600}li.on::before{content:"▶ ";font-size:11px}
-footer{color:var(--dim);font-size:12px;text-align:center;padding:24px}
+footer{color:var(--dim);font-size:12px;text-align:center;padding:24px;display:grid;gap:12px;justify-items:center}
+header{flex-wrap:wrap;gap:8px 16px;align-items:baseline}
+.soc{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--dim)}
+.soc a{color:var(--fg);text-decoration:none;border-bottom:1px solid #444}.soc a:hover{opacity:.6}
 </style></head><body>
-<header><h1>sobersasha</h1><span id="cnt" style="color:var(--dim);font-size:13px">загрузка…</span></header>
+<header><h1>sobersasha</h1><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a><span id="cnt">director</span></nav></header>
 <main>
 <div id="player"><video id="v" controls playsinline preload="metadata"></video><div id="now"></div></div>
 <div id="list"></div>
 </main>
-<footer>© sobersasha</footer>
+<footer><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a></nav>© sobersasha</footer>
 <script>
 const KEY='https://disk.yandex.ru/d/jjRS9pFYLpGZTQ',API='https://cloud-api.yandex.net/v1/disk/public/resources';
 const q=p=>`?public_key=${encodeURIComponent(KEY)}&path=${encodeURIComponent(p)}`;
@@ -70,7 +73,7 @@ async function walk(path,cat,out,seen){
     const k=it.md5||it.name+it.size; if(seen.has(k))continue; seen.add(k);
     const N=s=>s.normalize('NFC').toLowerCase().replace(/[^a-zа-яё0-9]/g,'');
     const n=Object.entries(T).find(([k])=>N(k)===N(it.path))?.[1]||[it.name.replace(/\.[^.]+$/,'').replace(/_/g,' ').replace(/\s+/g,' '),''];
-    out.push({cat:(cat||'Selected').replace(/_/g,' '),path:it.path,title:n[0],sub:n[1]});
+    out.push({cat:(cat||'TV').replace(/_/g,' '),path:it.path,title:n[0],sub:n[1]});
   }
 }
 async function play(i){
@@ -84,13 +87,12 @@ v.onended=()=>cur<items.length-1&&play(cur+1);
 v.onerror=()=>{if(cur>=0)now.textContent=items[cur].title+' — браузер не может воспроизвести этот формат'};
 (async()=>{
   await walk('/','',items,new Set());
-  const order=['Selected','Music video','Commercial','Fashion'];
+  const order=['TV','Music video','Commercial','Fashion'];
   items.sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));
   let html='',last='';
   items.forEach((it,i)=>{if(it.cat!==last){html+=(last?'</ul>':'')+`<h2>${it.cat}</h2><ul>`;last=it.cat}html+=`<li data-i="${i}">${it.title}<span style="color:var(--dim);pointer-events:none"> — ${it.sub}</span></li>`});
   document.getElementById('list').innerHTML=html+'</ul>';
   document.getElementById('list').onclick=e=>{const i=e.target.dataset.i;if(i!=null){play(+i);scrollTo({top:0,behavior:'smooth'})}};
-  document.getElementById('cnt').textContent=items.length+' работ';
   if(items.length){cur=0;document.querySelector('li').classList.add('on');now.textContent=items[0].title;
     const r=await (await fetch(API+'/download'+q(items[0].path))).json();v.src=r.href;}
 })();
