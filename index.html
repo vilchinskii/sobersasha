@@ -70,7 +70,7 @@ const v=document.getElementById('v'),now=document.getElementById('now');
 let items=[],cur=-1;
 const T={
 '/Patsanki.mp4':['Пацанки','золотой свет и тайна в кадре'],
-'/Майор Гром_сериал.mp4':['Майор Гром','сериал — кино на улицах Петербурга'],
+'/Майор Гром_сериал.mp4':['Майор Гром: Игра против правил','сериал — кино на улицах Петербурга'],
 '/Commercial/BetBoom.mov':['Убойный медиафутбол BetBoom','мяч, который решает матч'],
 '/Commercial/ROSTICS_Autumn.mp4':['Rostic’s Чикен Комбо','осень в сочном красном'],
 '/Commercial/Sber.mp4':['Молодежная Сберкарта ft. Exile и Парадевич','карта, которая всегда с тобой'],
@@ -82,12 +82,12 @@ const T={
 '/Fashion/Malbec/reel 5 mst v2.mp4':['Malbec','ночь среди своих'],
 '/Fashion/Malbec/reel 8 mst bolno v2.mp4':['Malbec','больно, но красиво'],
 '/Fashion/Amazing Red.mp4':['Amazing Red','сквозь сетку света'],
-'/Fashion/Amazing_Red.MP4':['Amazing Red','Ghost — тизер'],
+'/Fashion/Amazing_Red.MP4':['Amazing Red — Ghost',''],
 '/Fashion/OSTIN_promo_OLV.mp4':['O′STIN','школьный двор как подиум'],
 '/Fashion/Outlaw_Dinamo.mp4':['Outlaw × Динамо','винтажная оптика'],
 '/Fashion/USL.mp4':['USL','кукольный поцелуй'],
-'/Fashion/fakoshima_-_dear passengers mst.mp4':['fakoshima','уважаемые пассажиры'],
-'/Fashion/fakoshima_-_vending machine mst.mp4':['fakoshima','автомат с характером'],
+'/Fashion/fakoshima_-_dear passengers mst.mp4':['fakoshima — Dear Passengers',''],
+'/Fashion/fakoshima_-_vending machine mst.mp4':['fakoshima — Vending Machine',''],
 '/Music_video/Malbeс/reel 4 mst v2.mp4':['Malbec','комната-калейдоскоп'],
 '/Music_video/Malbeс/reel 6 mst v2.mp4':['Malbec','лето на траве'],
 '/Music_video/Malbeс/reel 7 mst rip.mp4':['Malbec','алые волосы, тихий лес'],
@@ -133,8 +133,9 @@ v.onerror=()=>{if(cur>=0)now.textContent=items[cur].title+' — браузер �
   items.sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));
   const spread=a=>{const m=a.filter(x=>x.title==='Malbec'),o=a.filter(x=>x.title!=='Malbec');if(!o.length)return a;const r=[...o];m.forEach((x,i)=>r.splice(Math.round((i+1)*o.length/(m.length+1))+i,0,x));return r};
   items=order.flatMap(c=>spread(items.filter(x=>x.cat===c))).concat(items.filter(x=>!order.includes(x.cat)));
+  let rn=0;items.forEach(it=>{if(it.cat==='Reels')it.title='Malbec — Reel '+(++rn)});
   let html='',last='';
-  items.forEach((it,i)=>{if(it.cat!==last){html+=(last?'</ul></section>':'')+`<section data-c="${it.cat}"><h2>${it.cat}</h2><ul>`;last=it.cat}html+=`<li data-i="${i}">${it.title}<span style="color:var(--dim);pointer-events:none"> — ${it.sub}</span></li>`});
+  items.forEach((it,i)=>{if(it.cat!==last){html+=(last?'</ul></section>':'')+`<section data-c="${it.cat}"><h2>${it.cat}</h2><ul>`;last=it.cat}html+=`<li data-i="${i}">${it.title}</li>`});
   document.getElementById('list').innerHTML=html+'</ul></section>';
   document.getElementById('list').onclick=e=>{const i=e.target.dataset.i;if(i!=null){play(+i);scrollTo({top:0,behavior:'smooth'})}};
   const hi=+(location.hash.match(/^#w(\d+)$/)||[])[1];
