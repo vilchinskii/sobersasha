@@ -10,7 +10,8 @@ main{max-width:1100px;margin:auto;padding:0 16px 60px}
 #player{position:sticky;top:0;background:var(--bg);padding-bottom:12px;z-index:2}
 video{width:100%;max-height:70vh;background:#000;display:block}
 #now{color:var(--dim);font-size:13px;margin-top:6px;min-height:20px}
-h2{font-size:12px;color:var(--dim);font-weight:400;text-transform:lowercase;margin:28px 0 8px}
+h2{font-size:12px;color:var(--dim);font-weight:400;margin:28px 0 8px}
+#about p{max-width:62ch;margin:0 0 10px;color:#bbb}
 ul{list-style:none;margin:0;padding:0}
 li{padding:5px 0;cursor:pointer;transition:opacity .2s}
 li:hover{opacity:.6}li.on{color:#fff;font-weight:600}li.on::before{content:"▶ ";font-size:11px}
@@ -19,10 +20,14 @@ header{flex-wrap:wrap;gap:8px 16px;align-items:baseline}
 .soc{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--dim)}
 .soc a{color:var(--fg);text-decoration:none;border-bottom:1px solid #444}.soc a:hover{opacity:.6}
 </style></head><body>
-<header><h1>sobersasha</h1><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a><span id="cnt">director</span></nav></header>
+<header><h1>sobersasha</h1><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a><a href="#about">О себе</a></nav></header>
 <main>
 <div id="player"><video id="v" controls playsinline preload="metadata"></video><div id="now"></div></div>
 <div id="list"></div>
+<section id="about"><h2>О себе</h2>
+<p>Александр Пьяных (sobersasha) — режиссёр, креативный директор и саунд-продюсер из Москвы, сооснователь группы «Мальбэк».</p>
+<p>Снимает музыкальные клипы для INSTASAMKA, Slava Marlow, Aarne, Seemee и Mayot, рекламу для Сбера, Яндекса, Rostic’s, Yota и BetBoom, а также fashion-проекты. Режиссёр сериала «Майор Гром: Игра против правил».</p>
+</section>
 </main>
 <footer><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a></nav>© sobersasha</footer>
 <script>
@@ -72,8 +77,8 @@ async function walk(path,cat,out,seen){
     if(it.media_type!=='video')continue;
     const k=it.md5||it.name+it.size; if(seen.has(k))continue; seen.add(k);
     const N=s=>s.normalize('NFC').toLowerCase().replace(/[^a-zа-яё0-9]/g,'');
-    const n=Object.entries(T).find(([k])=>N(k)===N(it.path))?.[1]||[it.name.replace(/\.[^.]+$/,'').replace(/_/g,' ').replace(/\s+/g,' '),''];
-    out.push({cat:(cat||'TV').replace(/_/g,' '),path:it.path,title:n[0],sub:n[1]});
+    const n=T[it.path]||Object.entries(T).find(([k])=>N(k)===N(it.path))?.[1]||[it.name.replace(/\.[^.]+$/,'').replace(/_/g,' ').replace(/\s+/g,' '),''];
+    out.push({cat:(cat||(/гром/i.test(it.name.normalize('NFC'))?'Selected':'TV')).replace(/_/g,' '),path:it.path,title:n[0],sub:n[1]});
   }
 }
 async function play(i){
@@ -87,8 +92,10 @@ v.onended=()=>cur<items.length-1&&play(cur+1);
 v.onerror=()=>{if(cur>=0)now.textContent=items[cur].title+' — браузер не может воспроизвести этот формат'};
 (async()=>{
   await walk('/','',items,new Set());
-  const order=['TV','Music video','Commercial','Fashion'];
+  const order=['Selected','Music video','Commercial','TV','Fashion'];
   items.sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));
+  const spread=a=>{const m=a.filter(x=>x.title==='Malbec'),o=a.filter(x=>x.title!=='Malbec');if(!o.length)return a;const r=[...o];m.forEach((x,i)=>r.splice(Math.round((i+1)*o.length/(m.length+1))+i,0,x));return r};
+  items=order.flatMap(c=>spread(items.filter(x=>x.cat===c))).concat(items.filter(x=>!order.includes(x.cat)));
   let html='',last='';
   items.forEach((it,i)=>{if(it.cat!==last){html+=(last?'</ul>':'')+`<h2>${it.cat}</h2><ul>`;last=it.cat}html+=`<li data-i="${i}">${it.title}<span style="color:var(--dim);pointer-events:none"> — ${it.sub}</span></li>`});
   document.getElementById('list').innerHTML=html+'</ul>';
