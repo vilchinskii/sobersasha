@@ -109,7 +109,7 @@ async function walk(path,cat,out,seen){
     const k=it.md5||it.name+it.size; if(seen.has(k))continue; seen.add(k);
     const N=s=>s.normalize('NFC').toLowerCase().replace(/[^a-zа-яё0-9]/g,'');
     const n=T[it.path]||Object.entries(T).find(([k])=>N(k)===N(it.path))?.[1]||[it.name.replace(/\.[^.]+$/,'').replace(/_/g,' ').replace(/\s+/g,' '),''];
-    out.push({cat:(cat||(/гром/i.test(it.name.normalize('NFC'))?'Selected':'TV')).replace(/_/g,' '),path:it.path,title:n[0],sub:n[1],pv:it.preview});
+    out.push({cat:n[0]==='Malbec'?'Reels':(cat||(/гром/i.test(it.name.normalize('NFC'))?'Selected':'TV')).replace(/_/g,' '),path:it.path,title:n[0],sub:n[1],pv:it.preview});
   }
 }
 async function play(i){
@@ -123,7 +123,7 @@ v.onended=()=>cur<items.length-1&&play(cur+1);
 v.onerror=()=>{if(cur>=0)now.textContent=items[cur].title+' — браузер не может воспроизвести этот формат'};
 (async()=>{
   await walk('/','',items,new Set());
-  const order=['Selected','Music video','Commercial','TV','Fashion'];
+  const order=['Selected','Music video','Commercial','TV','Fashion','Reels'];
   items.sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));
   const spread=a=>{const m=a.filter(x=>x.title==='Malbec'),o=a.filter(x=>x.title!=='Malbec');if(!o.length)return a;const r=[...o];m.forEach((x,i)=>r.splice(Math.round((i+1)*o.length/(m.length+1))+i,0,x));return r};
   items=order.flatMap(c=>spread(items.filter(x=>x.cat===c))).concat(items.filter(x=>!order.includes(x.cat)));
