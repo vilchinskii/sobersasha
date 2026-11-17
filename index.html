@@ -1,162 +1,155 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>sobersasha</title><meta name="referrer" content="no-referrer">
-<style>
-:root{--bg:#0a0a0a;--fg:#eee;--dim:#777}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 "Helvetica Neue",Arial,sans-serif}
-header{padding:24px 16px;display:flex;justify-content:space-between;max-width:1100px;margin:auto}
-h1{font-size:15px;font-weight:600;margin:0;text-transform:lowercase}
-main{max-width:1100px;margin:auto;padding:0 16px 60px}
-#player{position:sticky;top:0;background:var(--bg);padding-bottom:12px;z-index:2}
-video{width:100%;max-height:70vh;background:#000;display:block}
-#now{color:var(--dim);font-size:13px;margin-top:6px;min-height:20px}
-h2{font-size:12px;color:var(--dim);font-weight:400;margin:28px 0 8px}
-.ctrl{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.ctrl button,.chips button{background:none;border:1px solid #333;color:var(--fg);font:inherit;font-size:12px;padding:4px 12px;border-radius:20px;cursor:pointer;transition:.2s}
-.ctrl button:hover,.chips button.on,.chips button:hover{background:var(--fg);color:var(--bg)}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
-#bar{position:fixed;top:0;left:0;height:2px;background:#fff;width:0;z-index:20}
-#thumb{position:fixed;pointer-events:none;width:240px;aspect-ratio:16/9;object-fit:cover;opacity:0;transition:opacity .15s;z-index:15;left:0;top:0}
-#cur{position:fixed;width:10px;height:10px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:40;transform:translate(-50%,-50%);transition:width .2s,height .2s;left:-50px}
-#cur.big{width:44px;height:44px}
-header,#list,footer,#about,.chips{transition:opacity .5s}
-body.cinema header,body.cinema #list,body.cinema footer,body.cinema #about,body.cinema .chips{opacity:.06}
-@media (hover:none){#cur,#thumb{display:none}}
-#player{isolation:isolate;padding-top:8px}
-[hidden]{display:none!important}
-#yt{display:block;width:100%;aspect-ratio:16/9;max-height:70vh;border:0;background:#000}
-video{aspect-ratio:16/9;height:auto;object-fit:contain;max-width:100%}
-header,main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-html,body{overflow-x:hidden}
-@media (hover:none){.hint{display:none}}
-@media (max-width:700px){
-#player{position:static;padding-top:0}
-header{padding-block:16px 12px}
-.soc{font-size:14px;gap:8px 16px}
-li{padding:9px 0;line-height:1.4}
-.ctrl button,.chips button{padding:8px 14px;font-size:13px}
-.chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
-.chips::-webkit-scrollbar{display:none}
-.chips button{flex:none}
-h2{margin:24px 0 4px}
-}
-#about p{max-width:62ch;margin:0 0 10px;color:#bbb}
-ul{list-style:none;margin:0;padding:0}
-li{padding:5px 0;cursor:pointer;transition:opacity .2s}
-li:hover{opacity:.6}li.on{color:#fff;font-weight:600}li.on::before{content:"▶ ";font-size:11px}
-footer{color:var(--dim);font-size:12px;text-align:center;padding:24px;display:grid;gap:12px;justify-items:center}
-header{flex-wrap:wrap;gap:8px 16px;align-items:baseline}
-.soc{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--dim)}
-.soc a{color:var(--fg);text-decoration:none;border-bottom:1px solid #444}.soc a:hover{opacity:.6}
-</style></head><body>
-<header><h1>sobersasha</h1><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a><a href="#about">О себе</a></nav></header>
-<main>
-<div id="player"><video id="v" controls playsinline preload="metadata"></video><iframe id="yt" hidden referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen title="YouTube"></iframe><div id="now"></div><div class="ctrl"><button id="prev">← назад</button><button id="next">далее →</button><button id="rnd">случайный</button><button id="cin">режим кино</button><button id="shr">поделиться</button></div></div>
-<div class="chips" id="chips"></div>
-<div id="list"></div>
-<section id="about"><h2>О себе</h2>
-<p>Саша Пьяных (Саша Собер, sobersasha) — режиссёр и креативный директор из Москвы, бывший участник дуэта «Мальбэк». Начинал с музыки, а потом перенёс её ощущение в кадр.</p>
-<p>Один из ключевых клипмейкеров российской музыкальной индустрии последних лет. Номинант рейтинга Forbes «30 до 30» 2024 года в категории «Музыка».</p>
-<p>Клипы: «За деньги да» INSTASAMKA (63 млн просмотров), «Тесно» Aarne, Bushido Zho и Anikv (17 млн), «Телефон» Егора Крида, «Лиза» и «Каблуки» Slava Marlow, «Windows» Seemee и Mayot, Vandal Toxi$. Реклама для Сбера, Яндекса, Rostic’s, Yota и BetBoom, fashion-проекты. Работал над сериалом «Майор Гром: Игра против правил».</p>
-<p>Отвечает за идею и смысл: пишет тритмент, собирает референсы и выстраивает концепцию.</p>
-</section>
-</main>
-<footer><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a></nav><span>© sobersasha · Москва <span id="clock"></span><span class="hint"> · ← → листать, пробел пауза, F на весь экран</span></span></footer>
-<div id="bar"></div><img id="thumb" alt=""><div id="cur"></div>
-<script>
-const KEY='https://disk.yandex.ru/d/jjRS9pFYLpGZTQ',API='https://cloud-api.yandex.net/v1/disk/public/resources';
-const q=p=>`?public_key=${encodeURIComponent(KEY)}&path=${encodeURIComponent(p)}`;
-const v=document.getElementById('v'),now=document.getElementById('now');
-let items=[],cur=-1;
-const T={
-'/Patsanki.mp4':['Пацанки','золотой свет и тайна в кадре'],
-'/Майор Гром_сериал.mp4':['Майор Гром: Игра против правил','сериал — кино на улицах Петербурга'],
-'/Commercial/BetBoom.mov':['Убойный медиафутбол BetBoom','мяч, который решает матч'],
-'/Commercial/ROSTICS_Autumn.mp4':['Rostic’s Чикен Комбо','осень в сочном красном'],
-'/Commercial/Sber.mp4':['Молодежная Сберкарта ft. Exile и Парадевич','карта, которая всегда с тобой'],
-'/Commercial/YandexPay_barber_30.mp4':['Яндекс Пэй','барбершоп с волшебным касанием'],
-'/Commercial/Yota_20s_260626_upd3.mp4':['Yota Заработай','двадцать секунд щедрости'],
-'/Fashion/Malbec/reel 1 mst.mp4':['Malbec','взгляд сквозь пряди'],
-'/Fashion/Malbec/reel 2 mst.mp4':['Malbec','рыжая походка по городу'],
-'/Fashion/Malbec/reel 3 mst.mp4':['Malbec','шаг на каблуках'],
-'/Fashion/Malbec/reel 5 mst v2.mp4':['Malbec','ночь среди своих'],
-'/Fashion/Malbec/reel 8 mst bolno v2.mp4':['Malbec','больно, но красиво'],
-'/Fashion/Amazing Red.mp4':['Amazing Red','сквозь сетку света'],
-'/Fashion/Amazing_Red.MP4':['Amazing Red — Ghost',''],
-'/Fashion/OSTIN_promo_OLV.mp4':['O′STIN','школьный двор как подиум'],
-'/Fashion/Outlaw_Dinamo.mp4':['Outlaw × Динамо','винтажная оптика'],
-'/Fashion/USL.mp4':['USL','кукольный поцелуй'],
-'/Fashion/fakoshima_-_dear passengers mst.mp4':['fakoshima — Dear Passengers',''],
-'/Fashion/fakoshima_-_vending machine mst.mp4':['fakoshima — Vending Machine',''],
-'/Music_video/Malbeс/reel 4 mst v2.mp4':['Malbec','комната-калейдоскоп'],
-'/Music_video/Malbeс/reel 6 mst v2.mp4':['Malbec','лето на траве'],
-'/Music_video/Malbeс/reel 7 mst rip.mp4':['Malbec','алые волосы, тихий лес'],
-'/Music_video/Malbeс/reel 9 toys_4.mp4':['Malbec','среди игрушек'],
-'/Music_video/Malbeс/reel red intro 1 mst.mp4':['Malbec','red intro'],
-'/Music_video/Malbeс/reel red vse v golove.mp4':['Malbec','всё в голове'],
-'/Music_video/Aarne, Bushido Zho, Anikv - Тесно.mp4':['Aarne, Bushido Zho, Anikv — Тесно','ретро-телевизор в красном'],
-'/Music_video/BRUNETTE_H265.mp4':['BRUNETTE — SUPERSTAR ILLNESS','красное в ночном лесу'],
-'/Music_video/Instasamka -  За деньги да':['Instasamka — За деньги да','робо-рука и неон'],
-'/Music_video/Malbec.mp4':['Malbec','кожанка и полумрак'],
-'/Music_video/Seemee, Mayot - Windows.mp4':['Seemee, Mayot — Windows','свет из окна, ночь в подъезде'],
-'/Music_video/Siuzanna.mp4':['Siuzanna','оранжевый драйв'],
-'/Music_video/Slava Marlow - Лиза.mp4':['Slava Marlow — Лиза','толпа, летящая по коридору'],
-'/Music_video/Slava Marlow – Каблуки.mp4':['Slava Marlow — Каблуки','та самая красная кнопка'],
-'/Music_video/Минаева_Эти цветы так кстати.mp4':['Минаева — Эти цветы так кстати','цветы и нежный свет']};
-async function walk(path,cat,out,seen){
-  const r=await (await fetch(API+q(path)+'&limit=500&preview_size=L')).json();
-  for(const it of r._embedded.items){
-    if(it.type==='dir'){await walk(it.path,cat||it.name,out,seen);continue}
-    if(it.media_type!=='video')continue;
-    const k=it.md5||it.name+it.size; if(seen.has(k))continue; seen.add(k);
-    const N=s=>s.normalize('NFC').toLowerCase().replace(/[^a-zа-яё0-9]/g,'');
-    const n=T[it.path]||Object.entries(T).find(([k])=>N(k)===N(it.path))?.[1]||[it.name.replace(/\.[^.]+$/,'').replace(/_/g,' ').replace(/\s+/g,' '),''];
-    out.push({cat:n[0]==='Malbec'?'Reels':(cat||(/гром/i.test(it.name.normalize('NFC'))?'Selected':'TV')).replace(/_/g,' '),path:it.path,title:n[0],sub:n[1],pv:it.preview});
-  }
-}
-async function play(i){
-  cur=i;const it=items[i];history.replaceState(null,'','#w'+i);
-  document.querySelectorAll('li').forEach((l,j)=>l.classList.toggle('on',j===i));
-  now.textContent=it.title;
-  const yt=document.getElementById('yt');
-  if(it.yt){v.pause();v.hidden=true;yt.hidden=false;yt.src='https://www.youtube.com/embed/'+it.yt+'?autoplay=1&rel=0';return}
-  yt.hidden=true;yt.removeAttribute('src');v.hidden=false;
-  try{const r=await (await fetch(API+'/download'+q(it.path))).json();v.src=r.href;v.play().catch(()=>{});}
-  catch(e){now.textContent='Ошибка загрузки: '+it.title}
-}
-v.onended=()=>cur<items.length-1&&play(cur+1);
-v.onerror=()=>{if(cur>=0)now.textContent=items[cur].title+' — браузер не может воспроизвести этот формат'};
-(async()=>{
-  await walk('/','',items,new Set());
-  items.push({cat:'Film',yt:'ac_kS49M95w',title:'Нурландос',sub:'фильм с Нурланом Сабуровым',pv:'https://i.ytimg.com/vi/ac_kS49M95w/hqdefault.jpg'});
-  const order=['Selected','Music video','Commercial','TV','Film','Fashion','Reels'];
-  items.sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));
-  const spread=a=>{const m=a.filter(x=>x.title==='Malbec'),o=a.filter(x=>x.title!=='Malbec');if(!o.length)return a;const r=[...o];m.forEach((x,i)=>r.splice(Math.round((i+1)*o.length/(m.length+1))+i,0,x));return r};
-  items=order.flatMap(c=>spread(items.filter(x=>x.cat===c))).concat(items.filter(x=>!order.includes(x.cat)));
-  let rn=0;items.forEach(it=>{if(it.cat==='Reels')it.title='Malbec — Reel '+(++rn)});
-  let html='',last='';
-  items.forEach((it,i)=>{if(it.cat!==last){html+=(last?'</ul></section>':'')+`<section data-c="${it.cat}"><h2>${it.cat}</h2><ul>`;last=it.cat}html+=`<li data-i="${i}">${it.title}</li>`});
-  document.getElementById('list').innerHTML=html+'</ul></section>';
-  document.getElementById('list').onclick=e=>{const i=e.target.dataset.i;if(i!=null){play(+i);scrollTo({top:0,behavior:'smooth'})}};
-  const hi=+(location.hash.match(/^#w(\d+)$/)||[])[1];
-  if(hi>=0&&hi<items.length)play(hi);else if(items.length){cur=0;document.querySelector('li').classList.add('on');now.textContent=items[0].title;
-    const r=await (await fetch(API+'/download'+q(items[0].path))).json();v.src=r.href;}
-})();
-</script>
-<script>
-const $=id=>document.getElementById(id),list=$('list'),th=$('thumb'),cu=$('cur');
-const go=d=>items.length&&play((cur+d+items.length)%items.length);
-$('prev').onclick=()=>go(-1);$('next').onclick=()=>go(1);
-$('rnd').onclick=()=>play(Math.floor(Math.random()*items.length));
-$('cin').onclick=()=>document.body.classList.toggle('cinema');
-$('shr').onclick=async e=>{const u=location.href.split('#')[0]+'#w'+Math.max(cur,0);try{await navigator.clipboard.writeText(u);e.target.textContent='ссылка скопирована'}catch{prompt('Ссылка на работу',u)}setTimeout(()=>e.target.textContent='поделиться',1500)};
-addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(k===' '){e.preventDefault();v.paused?v.play():v.pause()}else if(k==='arrowright')go(1);else if(k==='arrowleft')go(-1);else if(k==='f'||k==='а')v.requestFullscreen&&v.requestFullscreen();else if(k==='c'||k==='с')$('cin').click();else if(k==='escape')document.body.classList.remove('cinema')});
-v.addEventListener('timeupdate',()=>$('bar').style.width=(v.currentTime/v.duration*100||0)+'%');
-list.addEventListener('mouseover',e=>{const l=e.target.closest('li');if(l&&items[l.dataset.i].pv){th.src=items[l.dataset.i].pv;th.style.opacity=1}});
-list.addEventListener('mouseout',()=>th.style.opacity=0);
-addEventListener('mousemove',e=>{cu.style.left=e.clientX+'px';cu.style.top=e.clientY+'px';th.style.left=e.clientX+24+'px';th.style.top=e.clientY+16+'px';cu.classList.toggle('big',!!e.target.closest('li,a,button,video'))});
-const clk=()=>$('clock').textContent=new Date().toLocaleTimeString('ru-RU',{timeZone:'Europe/Moscow',hour:'2-digit',minute:'2-digit'});clk();setInterval(clk,10000);
-new MutationObserver(()=>{if($('chips').children.length)return;const cs=[...list.querySelectorAll('section')].map(s=>s.dataset.c);$('chips').innerHTML=['Все',...cs].map((c,j)=>`<button class="${j?'':'on'}" data-c="${c}">${c}</button>`).join('')}).observe(list,{childList:true});
-$('chips').onclick=e=>{const c=e.target.dataset.c;if(!c)return;[...$('chips').children].forEach(b=>b.classList.toggle('on',b===e.target));list.querySelectorAll('section').forEach(s=>s.hidden=c!=='Все'&&s.dataset.c!==c)};
-</script>
-</body></html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>sobersasha</title>
+  <meta name="description" content="Саша Пьяных (sobersasha) — режиссёр и креативный директор. Клипы, реклама, fashion, reels.">
+  <meta name="theme-color" content="#050506">
+  <meta property="og:title" content="sobersasha">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:type" content="website">
+  <!-- Yandex Disk refuses video requests that carry another site's address; YouTube frames set their own policy -->
+  <meta name="referrer" content="no-referrer">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&family=Unbounded:wght@500;700;900&display=swap">
+  <link rel="stylesheet" href="style.css?v=7">
+</head>
+<body>
+
+  <!-- Living backdrop: a blurred loop of the active work; the glass picks up its colour -->
+  <div class="ambient" aria-hidden="true">
+    <video class="ambient__v is-on" muted loop playsinline></video>
+    <video class="ambient__v" muted loop playsinline></video>
+    <div class="ambient__veil"></div>
+  </div>
+
+  <main id="top">
+    <section class="works" id="works">
+      <h1 class="sr-only">sobersasha</h1>
+      <div class="grid" id="grid"></div>
+      <div class="sentinel" aria-hidden="true"></div>
+    </section>
+  </main>
+
+  <!-- Floating dock -->
+  <!-- After 30 seconds on the site the wall blows apart and this takes its place: the word КУРС, a link to the Telegram channel -->
+  <div class="boom" id="boom" hidden>
+    <i class="boom__flash" aria-hidden="true"></i>
+    <i class="boom__ring" aria-hidden="true"></i>
+    <a class="boom__link" href="https://t.me/sobersasha" target="_blank" rel="noopener" aria-label="Подпишись на Telegram-канал">
+      <span class="boom__word" aria-hidden="true"></span>
+      <span class="boom__hint" aria-hidden="true">клик</span>
+    </a>
+    <button class="ibtn glass boom__close" type="button" aria-label="Close"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  </div>
+
+  <!-- a small glass piece: the toast -->
+  <div class="toast glass" role="status" aria-live="polite"></div>
+
+  <!-- Phones and tablets: the search is its own plain bar fixed to the top of the screen
+       (the one in the dock only opens it). Nothing in it moves, blurs or measures the screen. -->
+  <div class="msearch" hidden>
+    <label class="msearch__field">
+      <svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.75" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m13 13 4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input type="search" aria-label="Search works" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search" maxlength="80">
+    </label>
+    <button class="msearch__close" type="button" aria-label="Close search"><svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  </div>
+
+  <div class="dock glass is-on" data-liquid role="toolbar" aria-label="Actions and contacts">
+    <i class="dock__blob" aria-hidden="true"></i>
+    <label class="search">
+      <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.75" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m13 13 4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input type="search" aria-label="Search works" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+    </label>
+    <i class="dock__sep" aria-hidden="true"></i>
+    <a class="dock__link" href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a>
+    <a class="dock__link" href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a>
+    <a class="dock__link" href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a>
+    <a class="dock__link" href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a>
+    <button data-open="contact" class="dock__contact" aria-label="Contact"><svg viewBox="0 0 20 20" width="19" height="19" aria-hidden="true"><path d="M4.200 4.500h11.600a1.200 1.200 0 0 1 1.200 1.200v7.100a1.200 1.200 0 0 1-1.200 1.200H9.300L5.800 17v-3H4.200A1.200 1.200 0 0 1 3 12.800V5.700a1.200 1.200 0 0 1 1.200-1.200z" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linejoin="round"/></svg></button>
+  </div>
+
+  <!-- Player -->
+  <dialog class="modal player" id="player" aria-labelledby="player-title">
+    <div class="player__frame">
+      <video class="player__glow" muted loop playsinline aria-hidden="true"></video>
+      <div class="player__video">
+        <div class="player__embed"></div>
+        <div class="credits" data-act="credits" aria-hidden="true"></div>
+      </div>
+      <div class="player__bar glass" data-liquid data-bezel="20" data-scale="60">
+        <div class="player__info">
+          <h2 id="player-title"></h2>
+          <p><span id="player-artist"></span></p>
+        </div>
+        <button class="pill glass player__credits" data-act="credits" aria-expanded="false" hidden>Credits</button>
+        <div class="player__ctrl">
+          <button class="ibtn glass" data-act="copy" aria-label="Share" title="Share"><svg class="ico-share" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 12.500V3M6.500 6.200 10 2.700l3.500 3.500M5.500 9.500H4.800a.8.8 0 0 0-.8.8v6.200a.8.8 0 0 0 .8.8h10.400a.8.8 0 0 0 .8-.8v-6.200a.8.8 0 0 0-.8-.8h-.7" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="ico-done" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="m4.500 10.500 3.500 3.500 7.500-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <a class="pill glass player__yt" target="_blank" rel="noopener">YouTube <span aria-hidden="true">↗</span></a>
+          <button class="ibtn glass" data-act="close" autofocus aria-label="Close"><svg viewBox="0 0 20 20" width="18" height="18"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Contact sheet -->
+  <dialog class="modal sheet" id="contact" aria-label="Contact">
+    <div class="sheet__panel" tabindex="-1" autofocus>
+      <ul class="drops">
+        <li><a class="drop glass" data-liquid data-bezel="34" data-scale="46" href="https://t.me/ew_an_den" target="_blank" rel="noopener" aria-label="Агент"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.500" width="18" height="13" rx="3.200" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linecap="round" stroke-linejoin="round"/><path d="m4 8 8 5.500L20 8" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="drop__label" aria-hidden="true">Агент</span></a></li>
+        <li><a class="drop glass" data-liquid data-bezel="34" data-scale="46" href="https://t.me/sobersasha" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.500 4.500 3.500 11l5.500 2 2 5.500 3-3.500 4 3z" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linecap="round" stroke-linejoin="round"/><path d="m9 13 6.500-4.500" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="drop__label" aria-hidden="true">Telegram</span></a></li>
+        <li><a class="drop glass" data-liquid data-bezel="34" data-scale="46" href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener" aria-label="Кинопоиск"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.500" y="3.500" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.900" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16.700" cy="7.300" r="1.100" fill="currentColor"/></svg><span class="drop__label" aria-hidden="true">Кинопоиск</span></a></li>
+        <li><a class="drop glass" data-liquid data-bezel="34" data-scale="46" href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener" aria-label="IMDb"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.500h14.500v9.500l-3.500 3.500h-3.500l-3 3v-3H5z" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 7.500v4M15 7.500v4" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="drop__label" aria-hidden="true">IMDb</span></a></li>
+      </ul>
+      <p class="sheet__foot" style="max-width:34em;margin-inline:auto;line-height:1.5">Саша Пьяных (sobersasha) — режиссёр и креативный директор из Москвы, бывший участник дуэта «Мальбэк». Номинант Forbes «30 до 30» 2024 в категории «Музыка». Клипы для INSTASAMKA, Aarne, Slava Marlow, Seemee и Mayot, реклама для Сбера, Яндекса, Rostic’s, Yota и BetBoom, сериал «Майор Гром: Игра против правил».</p>
+      <p class="sheet__foot">© <span class="js-year"></span> sobersasha</p>
+    </div>
+  </dialog>
+
+  <!-- Glass cursor lens -->
+  <div class="lens glass" data-liquid data-bezel="26" data-scale="96" data-zoom=".2" data-blur=".6px" aria-hidden="true">
+    <svg viewBox="0 0 20 20" width="20" height="20"><path d="M7 4.500v11l9-5.500z" fill="currentColor"/></svg>
+  </div>
+
+  <svg class="defs" width="0" height="0" aria-hidden="true"><defs id="liquid-defs"></defs></svg>
+
+  <script>
+  // Fetch a direct link for every video in the public Yandex Disk folder, then start the site.
+  (async () => {
+    const KEY = 'https://disk.yandex.ru/d/jjRS9pFYLpGZTQ';
+    const API = 'https://cloud-api.yandex.net/v1/disk/public/resources';
+    const q = p => `?public_key=${encodeURIComponent(KEY)}&path=${encodeURIComponent(p)}`;
+    const files = [];
+    const walk = async p => {
+      const r = await (await fetch(API + q(p) + '&limit=500&preview_size=640x&preview_crop=false')).json();
+      await Promise.all(r._embedded.items.map(it => it.type === 'dir' ? walk(it.path) : (it.media_type === 'video' && (files.push(it.path), window.PV[it.path.normalize('NFC')] = it.preview))));
+    };
+    window.SRC = {}; window.PV = {};
+    try { await walk('/'); } catch {}
+    // the wall starts right away with the still frames; video links arrive behind it
+    const s = document.createElement('script');
+    s.src = 'main.js?v=8';
+    document.body.append(s);
+    try {
+      // a few at a time: Yandex answers 429 when asked for everything at once
+      const queue = [...files];
+      await Promise.all(Array.from({ length: 4 }, async () => {
+        while (queue.length) {
+          const p = queue.shift();
+          for (let t = 0; t < 4; t++) {
+            try {
+              const r = await fetch(API + '/download' + q(p));
+              if (r.status === 429) { await new Promise(s => setTimeout(s, 700 * (t + 1))); continue; }
+              window.SRC[p.normalize('NFC')] = (await r.json()).href; break;
+            } catch { break; }
+          }
+        }
+      }));
+    } catch {}
+  })();
+  </script>
+</body>
+</html>
