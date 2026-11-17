@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>sobersasha</title><meta name="referrer" content="no-referrer">
+<style>
+:root{--bg:#0a0a0a;--fg:#eee;--dim:#777}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 "Helvetica Neue",Arial,sans-serif}
+header{padding:24px 16px;display:flex;justify-content:space-between;max-width:1100px;margin:auto}
+h1{font-size:15px;font-weight:600;margin:0;text-transform:lowercase}
+main{max-width:1100px;margin:auto;padding:0 16px 60px}
+#player{position:sticky;top:0;background:var(--bg);padding-bottom:12px;z-index:2}
+video{width:100%;max-height:70vh;background:#000;display:block}
+#now{color:var(--dim);font-size:13px;margin-top:6px;min-height:20px}
+h2{font-size:12px;color:var(--dim);font-weight:400;text-transform:lowercase;margin:28px 0 8px}
+ul{list-style:none;margin:0;padding:0}
+li{padding:5px 0;cursor:pointer;transition:opacity .2s}
+li:hover{opacity:.6}li.on{color:#fff;font-weight:600}li.on::before{content:"▶ ";font-size:11px}
+footer{color:var(--dim);font-size:12px;text-align:center;padding:24px}
+</style></head><body>
+<header><h1>sobersasha</h1><span id="cnt" style="color:var(--dim);font-size:13px">загрузка…</span></header>
+<main>
+<div id="player"><video id="v" controls playsinline preload="metadata"></video><div id="now"></div></div>
+<div id="list"></div>
+</main>
+<footer>© sobersasha</footer>
+<script>
+const KEY='https://disk.yandex.ru/d/jjRS9pFYLpGZTQ',API='https://cloud-api.yandex.net/v1/disk/public/resources';
+const q=p=>`?public_key=${encodeURIComponent(KEY)}&path=${encodeURIComponent(p)}`;
+const v=document.getElementById('v'),now=document.getElementById('now');
+let items=[],cur=-1;
+const T={
+'/Patsanki.mp4':['Пацанки','золотой свет и тайна в кадре'],
+'/Майор Гром_сериал.mp4':['Майор Гром','сериал — кино на улицах Петербурга'],
+'/Commercial/BetBoom.mov':['BetBoom','мяч, который решает матч'],
+'/Commercial/ROSTICS_Autumn.mp4':['Rostic’s','осень в сочном красном'],
+'/Commercial/Sber.mp4':['Сбер','карта, которая всегда с тобой'],
+'/Commercial/YandexPay_barber_30.mp4':['Яндекс Пэй','барбершоп с волшебным касанием'],
+'/Commercial/Yota_20s_260626_upd3.mp4':['Yota','двадцать секунд щедрости'],
+'/Fashion/Malbec/reel 1 mst.mp4':['Malbec','взгляд сквозь пряди'],
+'/Fashion/Malbec/reel 2 mst.mp4':['Malbec','рыжая походка по городу'],
+'/Fashion/Malbec/reel 3 mst.mp4':['Malbec','шаг на каблуках'],
+'/Fashion/Malbec/reel 5 mst v2.mp4':['Malbec','ночь среди своих'],
+'/Fashion/Malbec/reel 8 mst bolno v2.mp4':['Malbec','больно, но красиво'],
+'/Fashion/Amazing Red.mp4':['Amazing Red','сквозь сетку света'],
+'/Fashion/Amazing_Red.MP4':['Amazing Red','Ghost — тизер'],
+'/Fashion/OSTIN_promo_OLV.mp4':['O′STIN','школьный двор как подиум'],
+'/Fashion/Outlaw_Dinamo.mp4':['Outlaw × Динамо','винтажная оптика'],
+'/Fashion/USL.mp4':['USL','кукольный поцелуй'],
+'/Fashion/fakoshima_-_dear passengers mst.mp4':['fakoshima','уважаемые пассажиры'],
+'/Fashion/fakoshima_-_vending machine mst.mp4':['fakoshima','автомат с характером'],
+'/Music_video/Malbeс/reel 4 mst v2.mp4':['Malbec','комната-калейдоскоп'],
+'/Music_video/Malbeс/reel 6 mst v2.mp4':['Malbec','лето на траве'],
+'/Music_video/Malbeс/reel 7 mst rip.mp4':['Malbec','алые волосы, тихий лес'],
+'/Music_video/Malbeс/reel 9 toys_4.mp4':['Malbec','среди игрушек'],
+'/Music_video/Malbeс/reel red intro 1 mst.mp4':['Malbec','red intro'],
+'/Music_video/Malbeс/reel red vse v golove.mp4':['Malbec','всё в голове'],
+'/Music_video/Aarne, Bushido Zho, Anikv - Тесно.mp4':['Aarne, Bushido Zho, Anikv — Тесно','ретро-телевизор в красном'],
+'/Music_video/BRUNETTE_H265.mp4':['Brunette','красное в ночном лесу'],
+'/Music_video/Instasamka -  За деньги да':['Instasamka — За деньги да','робо-рука и неон'],
+'/Music_video/Malbec.mp4':['Malbec','кожанка и полумрак'],
+'/Music_video/Seemee, Mayot - Windows.mp4':['Seemee, Mayot — Windows','свет из окна, ночь в подъезде'],
+'/Music_video/Siuzanna.mp4':['Siuzanna','оранжевый драйв'],
+'/Music_video/Slava Marlow - Лиза.mp4':['Slava Marlow — Лиза','толпа, летящая по коридору'],
+'/Music_video/Slava Marlow – Каблуки.mp4':['Slava Marlow — Каблуки','та самая красная кнопка'],
+'/Music_video/Минаева_Эти цветы так кстати.mp4':['Минаева — Эти цветы так кстати','цветы и нежный свет']};
+async function walk(path,cat,out,seen){
+  const r=await (await fetch(API+q(path)+'&limit=500')).json();
+  for(const it of r._embedded.items){
+    if(it.type==='dir'){await walk(it.path,cat||it.name,out,seen);continue}
+    if(it.media_type!=='video')continue;
+    const k=it.md5||it.name+it.size; if(seen.has(k))continue; seen.add(k);
+    const N=s=>s.normalize('NFC').toLowerCase().replace(/[^a-zа-яё0-9]/g,'');
+    const n=Object.entries(T).find(([k])=>N(k)===N(it.path))?.[1]||[it.name.replace(/\.[^.]+$/,'').replace(/_/g,' ').replace(/\s+/g,' '),''];
+    out.push({cat:(cat||'Selected').replace(/_/g,' '),path:it.path,title:n[0],sub:n[1]});
+  }
+}
+async function play(i){
+  cur=i;const it=items[i];
+  document.querySelectorAll('li').forEach((l,j)=>l.classList.toggle('on',j===i));
+  now.textContent=it.title;
+  try{const r=await (await fetch(API+'/download'+q(it.path))).json();v.src=r.href;v.play().catch(()=>{});}
+  catch(e){now.textContent='Ошибка загрузки: '+it.title}
+}
+v.onended=()=>cur<items.length-1&&play(cur+1);
+v.onerror=()=>{if(cur>=0)now.textContent=items[cur].title+' — браузер не может воспроизвести этот формат'};
+(async()=>{
+  await walk('/','',items,new Set());
+  const order=['Selected','Music video','Commercial','Fashion'];
+  items.sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));
+  let html='',last='';
+  items.forEach((it,i)=>{if(it.cat!==last){html+=(last?'</ul>':'')+`<h2>${it.cat}</h2><ul>`;last=it.cat}html+=`<li data-i="${i}">${it.title}<span style="color:var(--dim);pointer-events:none"> — ${it.sub}</span></li>`});
+  document.getElementById('list').innerHTML=html+'</ul>';
+  document.getElementById('list').onclick=e=>{const i=e.target.dataset.i;if(i!=null){play(+i);scrollTo({top:0,behavior:'smooth'})}};
+  document.getElementById('cnt').textContent=items.length+' работ';
+  if(items.length){cur=0;document.querySelector('li').classList.add('on');now.textContent=items[0].title;
+    const r=await (await fetch(API+'/download'+q(items[0].path))).json();v.src=r.href;}
+})();
+</script>
+</body></html>
