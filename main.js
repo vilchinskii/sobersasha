@@ -378,6 +378,15 @@ function appendBatch() {
     frag.append(el('h2', 'sect', c));
     idx.forEach(i => { frag.append(makeCard(i, c === 'Selected')); laid.push(i); });
   }
+  // about: the closing section of the wall
+  const about = el('div', 'about');
+  about.id = 'about';
+  about.innerHTML = '<p>Саша Пьяных (sobersasha) — режиссёр и креативный директор из Москвы, бывший участник дуэта «Мальбэк». Начинал с музыки, а потом перенёс её ощущение в кадр.</p>'
+    + '<p>Один из ключевых клипмейкеров российской музыкальной индустрии последних лет, номинант Forbes «30 до 30» 2024 года в категории «Музыка».</p>'
+    + '<p>Клипы для INSTASAMKA, Aarne, Slava Marlow, Seemee и Mayot, реклама для Сбера, Яндекса, Rostic’s, Yota и BetBoom, fashion-проекты и сериал «Майор Гром: Игра против правил».</p>'
+    + '<p>Отвечает за идею и смысл: пишет тритмент, собирает референсы и выстраивает концепцию.</p>'
+    + '<p class="about__links"><a href="https://t.me/toosobersasha" target="_blank" rel="noopener">Telegram-канал ↗</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент ↗</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск ↗</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb ↗</a></p>';
+  frag.append(el('h2', 'sect', 'about'), about);
   grid.append(frag);
   return laid;
 }

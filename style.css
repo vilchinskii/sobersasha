@@ -1196,3 +1196,22 @@ html.look-sky {
   .sect--b, .card.card--b { grid-column: 2 / span 1; }
   .sect--a, .sect--b { font-size: clamp(18px, 5vw, 26px); }
 }
+/* about */
+.about {
+  grid-column: 1 / -1;
+  max-width: 46em;
+  padding: 0 4px 140px;
+  font-size: clamp(16px, 1.5vw, 20px);
+  line-height: 1.5;
+  color: var(--dim);
+}
+.about p { margin: 0 0 .9em; }
+.about p:first-child { color: var(--fg); font-weight: 600; }
+.about__links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1.4em !important; }
+.about__links a {
+  padding: .5em 1em; border-radius: 999px;
+  border: 1px solid rgba(245, 245, 247, .18); color: var(--fg);
+  font-size: .85em; transition: background .2s, color .2s;
+}
+.about__links a:hover { background: var(--fg); color: var(--bg); }
+.about, .about * { text-transform: none; }
