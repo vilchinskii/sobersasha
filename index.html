@@ -23,6 +23,8 @@ header,#list,footer,#about,.chips{transition:opacity .5s}
 body.cinema header,body.cinema #list,body.cinema footer,body.cinema #about,body.cinema .chips{opacity:.06}
 @media (hover:none){#cur,#thumb{display:none}}
 #player{isolation:isolate;padding-top:8px}
+[hidden]{display:none!important}
+#yt{display:block;width:100%;aspect-ratio:16/9;max-height:70vh;border:0;background:#000}
 video{aspect-ratio:16/9;height:auto;object-fit:contain;max-width:100%}
 header,main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 html,body{overflow-x:hidden}
@@ -49,7 +51,7 @@ header{flex-wrap:wrap;gap:8px 16px;align-items:baseline}
 </style></head><body>
 <header><h1>sobersasha</h1><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a><a href="#about">О себе</a></nav></header>
 <main>
-<div id="player"><video id="v" controls playsinline preload="metadata"></video><div id="now"></div><div class="ctrl"><button id="prev">← назад</button><button id="next">далее →</button><button id="rnd">случайный</button><button id="cin">режим кино</button><button id="shr">поделиться</button></div></div>
+<div id="player"><video id="v" controls playsinline preload="metadata"></video><iframe id="yt" hidden referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen title="YouTube"></iframe><div id="now"></div><div class="ctrl"><button id="prev">← назад</button><button id="next">далее →</button><button id="rnd">случайный</button><button id="cin">режим кино</button><button id="shr">поделиться</button></div></div>
 <div class="chips" id="chips"></div>
 <div id="list"></div>
 <section id="about"><h2>О себе</h2>
@@ -116,6 +118,9 @@ async function play(i){
   cur=i;const it=items[i];history.replaceState(null,'','#w'+i);
   document.querySelectorAll('li').forEach((l,j)=>l.classList.toggle('on',j===i));
   now.textContent=it.title;
+  const yt=document.getElementById('yt');
+  if(it.yt){v.pause();v.hidden=true;yt.hidden=false;yt.src='https://www.youtube.com/embed/'+it.yt+'?autoplay=1&rel=0';return}
+  yt.hidden=true;yt.removeAttribute('src');v.hidden=false;
   try{const r=await (await fetch(API+'/download'+q(it.path))).json();v.src=r.href;v.play().catch(()=>{});}
   catch(e){now.textContent='Ошибка загрузки: '+it.title}
 }
@@ -123,6 +128,7 @@ v.onended=()=>cur<items.length-1&&play(cur+1);
 v.onerror=()=>{if(cur>=0)now.textContent=items[cur].title+' — браузер не может воспроизвести этот формат'};
 (async()=>{
   await walk('/','',items,new Set());
+  items.push({cat:'TV',yt:'ac_kS49M95w',title:'Нурландос',sub:'фильм с Нурланом Сабуровым',pv:'https://i.ytimg.com/vi/ac_kS49M95w/hqdefault.jpg'});
   const order=['Selected','Music video','Commercial','TV','Fashion','Reels'];
   items.sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));
   const spread=a=>{const m=a.filter(x=>x.title==='Malbec'),o=a.filter(x=>x.title!=='Malbec');if(!o.length)return a;const r=[...o];m.forEach((x,i)=>r.splice(Math.round((i+1)*o.length/(m.length+1))+i,0,x));return r};
