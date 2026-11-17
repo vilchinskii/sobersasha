@@ -11,6 +11,18 @@ main{max-width:1100px;margin:auto;padding:0 16px 60px}
 video{width:100%;max-height:70vh;background:#000;display:block}
 #now{color:var(--dim);font-size:13px;margin-top:6px;min-height:20px}
 h2{font-size:12px;color:var(--dim);font-weight:400;margin:28px 0 8px}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.ctrl button,.chips button{background:none;border:1px solid #333;color:var(--fg);font:inherit;font-size:12px;padding:4px 12px;border-radius:20px;cursor:pointer;transition:.2s}
+.ctrl button:hover,.chips button.on,.chips button:hover{background:var(--fg);color:var(--bg)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+#bar{position:fixed;top:0;left:0;height:2px;background:#fff;width:0;z-index:20}
+#thumb{position:fixed;pointer-events:none;width:240px;aspect-ratio:16/9;object-fit:cover;opacity:0;transition:opacity .15s;z-index:15;left:0;top:0}
+#grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30;opacity:.05}
+#cur{position:fixed;width:10px;height:10px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:40;transform:translate(-50%,-50%);transition:width .2s,height .2s;left:-50px}
+#cur.big{width:44px;height:44px}
+header,#list,footer,#about,.chips{transition:opacity .5s}
+body.cinema header,body.cinema #list,body.cinema footer,body.cinema #about,body.cinema .chips{opacity:.06}
+@media (hover:none){#cur,#thumb{display:none}}
 #about p{max-width:62ch;margin:0 0 10px;color:#bbb}
 ul{list-style:none;margin:0;padding:0}
 li{padding:5px 0;cursor:pointer;transition:opacity .2s}
@@ -22,7 +34,8 @@ header{flex-wrap:wrap;gap:8px 16px;align-items:baseline}
 </style></head><body>
 <header><h1>sobersasha</h1><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a><a href="#about">О себе</a></nav></header>
 <main>
-<div id="player"><video id="v" controls playsinline preload="metadata"></video><div id="now"></div></div>
+<div id="player"><video id="v" controls playsinline preload="metadata"></video><div id="now"></div><div class="ctrl"><button id="prev">← назад</button><button id="next">далее →</button><button id="rnd">случайный</button><button id="cin">режим кино</button><button id="shr">поделиться</button></div></div>
+<div class="chips" id="chips"></div>
 <div id="list"></div>
 <section id="about"><h2>О себе</h2>
 <p>Саша Пьяных (Саша Собер, sobersasha) — режиссёр и креативный директор из Москвы, бывший участник дуэта «Мальбэк». Начинал с музыки, а потом перенёс её ощущение в кадр.</p>
@@ -31,7 +44,8 @@ header{flex-wrap:wrap;gap:8px 16px;align-items:baseline}
 <p>Отвечает за идею и смысл: пишет тритмент, собирает референсы и выстраивает концепцию.</p>
 </section>
 </main>
-<footer><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a></nav>© sobersasha</footer>
+<footer><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a></nav><span>© sobersasha · Москва <span id="clock"></span> · ← → листать, пробел пауза, F на весь экран</span></footer>
+<div id="bar"></div><img id="thumb" alt=""><canvas id="grain"></canvas><div id="cur"></div>
 <script>
 const KEY='https://disk.yandex.ru/d/jjRS9pFYLpGZTQ',API='https://cloud-api.yandex.net/v1/disk/public/resources';
 const q=p=>`?public_key=${encodeURIComponent(KEY)}&path=${encodeURIComponent(p)}`;
@@ -73,18 +87,18 @@ const T={
 '/Music_video/Slava Marlow – Каблуки.mp4':['Slava Marlow — Каблуки','та самая красная кнопка'],
 '/Music_video/Минаева_Эти цветы так кстати.mp4':['Минаева — Эти цветы так кстати','цветы и нежный свет']};
 async function walk(path,cat,out,seen){
-  const r=await (await fetch(API+q(path)+'&limit=500')).json();
+  const r=await (await fetch(API+q(path)+'&limit=500&preview_size=L')).json();
   for(const it of r._embedded.items){
     if(it.type==='dir'){await walk(it.path,cat||it.name,out,seen);continue}
     if(it.media_type!=='video')continue;
     const k=it.md5||it.name+it.size; if(seen.has(k))continue; seen.add(k);
     const N=s=>s.normalize('NFC').toLowerCase().replace(/[^a-zа-яё0-9]/g,'');
     const n=T[it.path]||Object.entries(T).find(([k])=>N(k)===N(it.path))?.[1]||[it.name.replace(/\.[^.]+$/,'').replace(/_/g,' ').replace(/\s+/g,' '),''];
-    out.push({cat:(cat||(/гром/i.test(it.name.normalize('NFC'))?'Selected':'TV')).replace(/_/g,' '),path:it.path,title:n[0],sub:n[1]});
+    out.push({cat:(cat||(/гром/i.test(it.name.normalize('NFC'))?'Selected':'TV')).replace(/_/g,' '),path:it.path,title:n[0],sub:n[1],pv:it.preview});
   }
 }
 async function play(i){
-  cur=i;const it=items[i];
+  cur=i;const it=items[i];history.replaceState(null,'','#w'+i);
   document.querySelectorAll('li').forEach((l,j)=>l.classList.toggle('on',j===i));
   now.textContent=it.title;
   try{const r=await (await fetch(API+'/download'+q(it.path))).json();v.src=r.href;v.play().catch(()=>{});}
@@ -99,11 +113,31 @@ v.onerror=()=>{if(cur>=0)now.textContent=items[cur].title+' — браузер �
   const spread=a=>{const m=a.filter(x=>x.title==='Malbec'),o=a.filter(x=>x.title!=='Malbec');if(!o.length)return a;const r=[...o];m.forEach((x,i)=>r.splice(Math.round((i+1)*o.length/(m.length+1))+i,0,x));return r};
   items=order.flatMap(c=>spread(items.filter(x=>x.cat===c))).concat(items.filter(x=>!order.includes(x.cat)));
   let html='',last='';
-  items.forEach((it,i)=>{if(it.cat!==last){html+=(last?'</ul>':'')+`<h2>${it.cat}</h2><ul>`;last=it.cat}html+=`<li data-i="${i}">${it.title}<span style="color:var(--dim);pointer-events:none"> — ${it.sub}</span></li>`});
-  document.getElementById('list').innerHTML=html+'</ul>';
+  items.forEach((it,i)=>{if(it.cat!==last){html+=(last?'</ul></section>':'')+`<section data-c="${it.cat}"><h2>${it.cat}</h2><ul>`;last=it.cat}html+=`<li data-i="${i}">${it.title}<span style="color:var(--dim);pointer-events:none"> — ${it.sub}</span></li>`});
+  document.getElementById('list').innerHTML=html+'</ul></section>';
   document.getElementById('list').onclick=e=>{const i=e.target.dataset.i;if(i!=null){play(+i);scrollTo({top:0,behavior:'smooth'})}};
-  if(items.length){cur=0;document.querySelector('li').classList.add('on');now.textContent=items[0].title;
+  const hi=+(location.hash.match(/^#w(\d+)$/)||[])[1];
+  if(hi>=0&&hi<items.length)play(hi);else if(items.length){cur=0;document.querySelector('li').classList.add('on');now.textContent=items[0].title;
     const r=await (await fetch(API+'/download'+q(items[0].path))).json();v.src=r.href;}
 })();
+</script>
+<script>
+const $=id=>document.getElementById(id),list=$('list'),th=$('thumb'),cu=$('cur');
+const go=d=>items.length&&play((cur+d+items.length)%items.length);
+$('prev').onclick=()=>go(-1);$('next').onclick=()=>go(1);
+$('rnd').onclick=()=>play(Math.floor(Math.random()*items.length));
+$('cin').onclick=()=>document.body.classList.toggle('cinema');
+$('shr').onclick=async e=>{const u=location.href.split('#')[0]+'#w'+Math.max(cur,0);try{await navigator.clipboard.writeText(u);e.target.textContent='ссылка скопирована'}catch{prompt('Ссылка на работу',u)}setTimeout(()=>e.target.textContent='поделиться',1500)};
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(k===' '){e.preventDefault();v.paused?v.play():v.pause()}else if(k==='arrowright')go(1);else if(k==='arrowleft')go(-1);else if(k==='f'||k==='а')v.requestFullscreen&&v.requestFullscreen();else if(k==='c'||k==='с')$('cin').click();else if(k==='escape')document.body.classList.remove('cinema')});
+v.addEventListener('timeupdate',()=>$('bar').style.width=(v.currentTime/v.duration*100||0)+'%');
+list.addEventListener('mouseover',e=>{const l=e.target.closest('li');if(l&&items[l.dataset.i].pv){th.src=items[l.dataset.i].pv;th.style.opacity=1}});
+list.addEventListener('mouseout',()=>th.style.opacity=0);
+addEventListener('mousemove',e=>{cu.style.left=e.clientX+'px';cu.style.top=e.clientY+'px';th.style.left=e.clientX+24+'px';th.style.top=e.clientY+16+'px';cu.classList.toggle('big',!!e.target.closest('li,a,button,video'))});
+const g=$('grain'),gx=g.getContext('2d');g.width=g.height=160;const im=gx.createImageData(160,160);
+const noise=()=>{for(let p=0;p<im.data.length;p+=4){im.data[p]=im.data[p+1]=im.data[p+2]=Math.random()*255;im.data[p+3]=255}gx.putImageData(im,0,0)};noise();
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches)setInterval(noise,90);
+const clk=()=>$('clock').textContent=new Date().toLocaleTimeString('ru-RU',{timeZone:'Europe/Moscow',hour:'2-digit',minute:'2-digit'});clk();setInterval(clk,10000);
+new MutationObserver(()=>{if($('chips').children.length)return;const cs=[...list.querySelectorAll('section')].map(s=>s.dataset.c);$('chips').innerHTML=['Все',...cs].map((c,j)=>`<button class="${j?'':'on'}" data-c="${c}">${c}</button>`).join('')}).observe(list,{childList:true});
+$('chips').onclick=e=>{const c=e.target.dataset.c;if(!c)return;[...$('chips').children].forEach(b=>b.classList.toggle('on',b===e.target));list.querySelectorAll('section').forEach(s=>s.hidden=c!=='Все'&&s.dataset.c!==c)};
 </script>
 </body></html>
