@@ -22,6 +22,22 @@ h2{font-size:12px;color:var(--dim);font-weight:400;margin:28px 0 8px}
 header,#list,footer,#about,.chips{transition:opacity .5s}
 body.cinema header,body.cinema #list,body.cinema footer,body.cinema #about,body.cinema .chips{opacity:.06}
 @media (hover:none){#cur,#thumb{display:none}}
+#player{isolation:isolate;padding-top:8px}
+video{aspect-ratio:16/9;height:auto;object-fit:contain;max-width:100%}
+header,main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+html,body{overflow-x:hidden}
+@media (hover:none){.hint{display:none}}
+@media (max-width:700px){
+#player{position:static;padding-top:0}
+header{padding-block:16px 12px}
+.soc{font-size:14px;gap:8px 16px}
+li{padding:9px 0;line-height:1.4}
+.ctrl button,.chips button{padding:8px 14px;font-size:13px}
+.chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none}
+h2{margin:24px 0 4px}
+}
 #about p{max-width:62ch;margin:0 0 10px;color:#bbb}
 ul{list-style:none;margin:0;padding:0}
 li{padding:5px 0;cursor:pointer;transition:opacity .2s}
@@ -43,7 +59,7 @@ header{flex-wrap:wrap;gap:8px 16px;align-items:baseline}
 <p>Отвечает за идею и смысл: пишет тритмент, собирает референсы и выстраивает концепцию.</p>
 </section>
 </main>
-<footer><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a></nav><span>© sobersasha · Москва <span id="clock"></span> · ← → листать, пробел пауза, F на весь экран</span></footer>
+<footer><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a></nav><span>© sobersasha · Москва <span id="clock"></span><span class="hint"> · ← → листать, пробел пауза, F на весь экран</span></span></footer>
 <div id="bar"></div><img id="thumb" alt=""><div id="cur"></div>
 <script>
 const KEY='https://disk.yandex.ru/d/jjRS9pFYLpGZTQ',API='https://cloud-api.yandex.net/v1/disk/public/resources';
