@@ -17,7 +17,6 @@ h2{font-size:12px;color:var(--dim);font-weight:400;margin:28px 0 8px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
 #bar{position:fixed;top:0;left:0;height:2px;background:#fff;width:0;z-index:20}
 #thumb{position:fixed;pointer-events:none;width:240px;aspect-ratio:16/9;object-fit:cover;opacity:0;transition:opacity .15s;z-index:15;left:0;top:0}
-#grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30;opacity:.05}
 #cur{position:fixed;width:10px;height:10px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:40;transform:translate(-50%,-50%);transition:width .2s,height .2s;left:-50px}
 #cur.big{width:44px;height:44px}
 header,#list,footer,#about,.chips{transition:opacity .5s}
@@ -45,7 +44,7 @@ header{flex-wrap:wrap;gap:8px 16px;align-items:baseline}
 </section>
 </main>
 <footer><nav class="soc"><a href="https://t.me/sobersasha" target="_blank" rel="noopener">Telegram</a><a href="https://t.me/ew_an_den" target="_blank" rel="noopener">Агент</a><a href="https://www.kinopoisk.ru/name/10218400/" target="_blank" rel="noopener">Кинопоиск</a><a href="https://www.imdb.com/name/nm17260577/" target="_blank" rel="noopener">IMDb</a></nav><span>© sobersasha · Москва <span id="clock"></span> · ← → листать, пробел пауза, F на весь экран</span></footer>
-<div id="bar"></div><img id="thumb" alt=""><canvas id="grain"></canvas><div id="cur"></div>
+<div id="bar"></div><img id="thumb" alt=""><div id="cur"></div>
 <script>
 const KEY='https://disk.yandex.ru/d/jjRS9pFYLpGZTQ',API='https://cloud-api.yandex.net/v1/disk/public/resources';
 const q=p=>`?public_key=${encodeURIComponent(KEY)}&path=${encodeURIComponent(p)}`;
@@ -133,9 +132,6 @@ v.addEventListener('timeupdate',()=>$('bar').style.width=(v.currentTime/v.durati
 list.addEventListener('mouseover',e=>{const l=e.target.closest('li');if(l&&items[l.dataset.i].pv){th.src=items[l.dataset.i].pv;th.style.opacity=1}});
 list.addEventListener('mouseout',()=>th.style.opacity=0);
 addEventListener('mousemove',e=>{cu.style.left=e.clientX+'px';cu.style.top=e.clientY+'px';th.style.left=e.clientX+24+'px';th.style.top=e.clientY+16+'px';cu.classList.toggle('big',!!e.target.closest('li,a,button,video'))});
-const g=$('grain'),gx=g.getContext('2d');g.width=g.height=160;const im=gx.createImageData(160,160);
-const noise=()=>{for(let p=0;p<im.data.length;p+=4){im.data[p]=im.data[p+1]=im.data[p+2]=Math.random()*255;im.data[p+3]=255}gx.putImageData(im,0,0)};noise();
-if(!matchMedia('(prefers-reduced-motion: reduce)').matches)setInterval(noise,90);
 const clk=()=>$('clock').textContent=new Date().toLocaleTimeString('ru-RU',{timeZone:'Europe/Moscow',hour:'2-digit',minute:'2-digit'});clk();setInterval(clk,10000);
 new MutationObserver(()=>{if($('chips').children.length)return;const cs=[...list.querySelectorAll('section')].map(s=>s.dataset.c);$('chips').innerHTML=['Все',...cs].map((c,j)=>`<button class="${j?'':'on'}" data-c="${c}">${c}</button>`).join('')}).observe(list,{childList:true});
 $('chips').onclick=e=>{const c=e.target.dataset.c;if(!c)return;[...$('chips').children].forEach(b=>b.classList.toggle('on',b===e.target));list.querySelectorAll('section').forEach(s=>s.hidden=c!=='Все'&&s.dataset.c!==c)};
